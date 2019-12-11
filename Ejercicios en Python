@@ -1,0 +1,70 @@
+import os
+import numpy as np
+import pandas as pd
+import geostatspy 
+
+os.chdir("c:/Users\Jorge\Desktop\sgem datos") 
+print("Directory changed")
+
+df=pd.read_csv("2D_MV_200wells.txt") #df is data frame
+#print(df.iloc[0:20,:])
+df.head()
+
+df.describe().transpose()
+
+df=df.rename (columns={'facies_threshold_0.3':'facies','permeability':'perm','acoustic_impedance':'ai'})
+df.head()
+
+df_subset=df.iloc[0:5,2:7]
+print(df_subset)
+
+zeros=np.zeros(200)
+df['zero']=pd.Series(zeros)  #Series tiene que ir con mayúscula
+df.head()
+
+df=df.drop("zero",axis=1)
+df.head()
+
+df['porosity100']=df['porosity']*100
+df['pem/por']=df['perm']/df['porosity']
+#df=df.drop("pem*por",axis=1)
+df.head()
+
+df['tporosity']=np.where(df['porosity']>=0.12,'high','low')
+df.head()
+
+df['perm_cutoff']=np.where(df['porosity']>=0.12,df['perm'],0.0001)
+df.head()
+
+df.set_value(1,'porosity',np.NaN)
+print('Number of null values in our Data Frame =',str(df.isnull().sum().sum()))
+NaN_rows=df[df['porosity'].isnull()]
+print(NaN_rows)
+
+df=df.dropna()
+df.head()
+
+df_extract=df.loc[(df['porosity']>0.12)&(df['perm']>10)]
+df_extract.head()
+
+por=df['porosity'].values
+perm=df['perm'].values
+df_new=pd.DataFrame({'porosity':por,'permeability':perm})
+df_new.head()
+
+print(df.index)
+print(df.columns)
+print(df.values)
+
+list(df)
+
+col2_name=df.columns[3]
+print(col2_name)
+por1=df.values[1,3]
+print('Porosity value for sample number 1 is '+str(por1)+'.')
+
+#porosity_map_test=np.loadtxt("https://github.com/GeostatsGuy/GeoDataSets/blob/master/porosity_map.csv", delimiter=",")
+#np.savetxt('https://github.com/GeostatsGuy/GeoDataSets/blob/master/porosity_map.csv',porosity_map,delimiter=',')
+pixelplt(porosity_map,xmin,xmax,ymin,ymax,cell_size,vmin,vmax,"Porosity truth map","X(m)","Y(m)","Porosity (%)",cmap)
+
+porosity_map = np.fromfile("https://github.com/GeostatsGuy/GeoDataSets/blob/master/porosity_truth_map.dat")
